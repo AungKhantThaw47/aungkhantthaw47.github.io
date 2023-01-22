@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            body {
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="js/three.js"></script>
+        <script>
+            const material1 = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const material2 = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+            const raycaster = new THREE.Raycaster();
+            const pointer = new THREE.Vector2();
+            var clickedObj = [];
+            var locationMatrix = [];
+            var checkMatrix = [
+                [null, null, null],
+                [null, null, null],
+                [null, null, null],
+            ];
+            var playerOne = true;
+
+            function UpdateMatrix(id, player) {
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        if (id == locationMatrix[i][j]) {
+                            checkMatrix[i][j] = player;
+                        }
+                    }
+                }
+            }
+
+            function CheckWhichPlayerWin() {
+                let row1, row2, row3, column1, column2, column3, diagon;
+                row1 = checkMatrix[0][0];
+                row2 = checkMatrix[1][0];
+                row3 = checkMatrix[2][0];
+                column1 = checkMatrix[0][0];
+                column2 = checkMatrix[0][1];
+                column2 = checkMatrix[0][2];
+                diagon = checkMatrix[0][0];
+                for (let i = 1; i < 3; i++) {
+                    if (row1 == checkMatrix[0][i]) {
+                    } else {
+                        row1 = 0;
+                    }
+                    if (row2 == checkMatrix[1][i]) {
+                    } else {
+                        row2 = 0;
+                    }
+                    if (row3 == checkMatrix[2][i]) {
+                    } else {
+                        row3 = 0;
+                    }
+                    if (column1 == checkMatrix[i][0]) {
+                    } else {
+                        column1 = 0;
+                    }
+                    if (column2 == checkMatrix[i][1]) {
+                    } else {
+                        column2 = 0;
+                    }
+                    if (column3 == checkMatrix[i][2]) {
+                    } else {
+                        column3 = 0;
+                    }
+                    if (diagon == checkMatrix[i][i]) {
+                    } else {
+                        diagon = 0;
+                    }
+                }
+                if (row1 == 1 || row1 == 2) {
+                    return true;
+                }
+                if (row2 == 1 || row2 == 2) {
+                    return true;
+                }
+                if (row3 == 1 || row3 == 2) {
+                    return true;
+                }
+                if (column1 == 1 || column1 == 2) {
+                    return true;
+                }
+                if (column2 == 1 || column2 == 2) {
+                    return true;
+                }
+                if (column3 == 1 || column3 == 2) {
+                    return true;
+                }
+                if (diagon == 1 || diagon == 2) {
+                    return true;
+                }
+                return false;
+            }
+
+            function onMouseClick() {
+                console.log("he");
+                for (let i = 0; i < intersects.length; i++) {
+                    id = intersects[i].object.uuid;
+                    console.log("hi " + id);
+                    if (clickedObj.find((ele) => ele == id)) {
+                        console.log("same");
+                    } else {
+                        // intersects[i].object.material.color.set(0xff0000);
+                        if (playerOne) {
+                            UpdateMatrix(id, 1);
+                            intersects[i].object.material = material1;
+                            playerOne = false;
+                        } else {
+                            UpdateMatrix(id, 2);
+                            intersects[i].object.material = material2;
+                            playerOne = true;
+                        }
+                        if (CheckWhichPlayerWin() == true) {
+                            if(playerOne){
+                                alert("Player Two win")
+                            }
+                            else{
+                                alert("Player One win")
+                            }
+                        }
+                        clickedObj.push(id);
+                    }
+                }
+            }
+
+            function onPointerMove(event) {
+                // calculate pointer position in normalized device coordinates
+                // (-1 to +1) for both components
+
+                pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+                pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            }
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+
+            var intersects;
+
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const cube = new THREE.Mesh(geometry, material);
+
+            scene.add(cube);
+            cube.position.x = -2;
+            cube.position.y = 2;
+            const cube1 = new THREE.Mesh(geometry, material);
+            scene.add(cube1);
+            cube1.position.x = 0;
+            cube1.position.y = 2;
+            const cube2 = new THREE.Mesh(geometry, material);
+            scene.add(cube2);
+            cube2.position.x = 2;
+            cube2.position.y = 2;
+            const cube3 = new THREE.Mesh(geometry, material);
+            scene.add(cube3);
+            cube3.position.x = -2;
+            cube3.position.y = 0;
+            const cube4 = new THREE.Mesh(geometry, material);
+            scene.add(cube4);
+            cube4.position.x = 0;
+            cube4.position.y = 0;
+            const cube5 = new THREE.Mesh(geometry, material);
+            scene.add(cube5);
+            cube5.position.x = 2;
+            cube5.position.y = 0;
+            const cube6 = new THREE.Mesh(geometry, material);
+            scene.add(cube6);
+            cube6.position.x = -2;
+            cube6.position.y = -2;
+            const cube7 = new THREE.Mesh(geometry, material);
+            scene.add(cube7);
+            cube7.position.x = 0;
+            cube7.position.y = -2;
+            const cube8 = new THREE.Mesh(geometry, material);
+            scene.add(cube8);
+            cube8.position.x = 2;
+            cube8.position.y = -2;
+
+            locationMatrix = [
+                [cube.uuid, cube1.uuid, cube2.uuid],
+                [cube3.uuid, cube4.uuid, cube5.uuid],
+                [cube6.uuid, cube7.uuid, cube8.uuid],
+            ];
+
+            camera.position.z = 5;
+
+            function animate() {
+                window.addEventListener("pointermove", onPointerMove);
+                requestAnimationFrame(animate);
+                raycaster.setFromCamera(pointer, camera);
+                intersects = raycaster.intersectObjects(scene.children);
+                // calculate objects intersecting the picking ray
+
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+                cube1.rotation.x += 0.01;
+                cube1.rotation.y += 0.01;
+                cube2.rotation.x += 0.01;
+                cube2.rotation.y += 0.01;
+                cube3.rotation.x += 0.01;
+                cube3.rotation.y += 0.01;
+                cube4.rotation.x += 0.01;
+                cube4.rotation.y += 0.01;
+                cube5.rotation.x += 0.01;
+                cube5.rotation.y += 0.01;
+                cube6.rotation.x += 0.01;
+                cube6.rotation.y += 0.01;
+                cube7.rotation.x += 0.01;
+                cube7.rotation.y += 0.01;
+                cube8.rotation.x += 0.01;
+                cube8.rotation.y += 0.01;
+
+                renderer.render(scene, camera);
+            }
+            // window.addEventListener("click",onMouseClick);
+            window.onclick = onMouseClick;
+            animate();
+        </script>
+    </body>
+</html>
